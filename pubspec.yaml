@@ -4,12 +4,11 @@ version: 1.0.0+1
 homepage: https://github.com/tienpx-x/pt_architecture
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_disposebag: ^1.0.0
 
 dev_dependencies:
   flutter_test:

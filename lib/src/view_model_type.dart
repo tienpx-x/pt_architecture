@@ -1,5 +1,5 @@
-import 'package:flutter_disposebag/flutter_disposebag.dart';
+import 'dispose_bag/base_dispose_bag.dart';
 
 abstract class ViewModelType<I, O> {
-  O transform([I input, DisposeBag bag]) {}
+  O transform(I input, [DisposeBag bag]) {}
 }
