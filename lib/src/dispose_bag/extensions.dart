@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'dispose_bag/dispose_bag.dart';
+import 'dispose_bag.dart';
 
 /// [disposedBy] extension method for [StreamSubscription]
 extension StreamSubscriptionDisposedByExtension<T> on StreamSubscription<T> {
@@ -18,7 +18,7 @@ extension SinkDisposedByExtension<T> on Sink<T> {
 
 /// [disposedBy] extension method for [Iterable] of [StreamSubscription]s
 extension StreamSubscriptionIterableDisposedByExtension<T>
-on Iterable<StreamSubscription<T>> {
+    on Iterable<StreamSubscription<T>> {
   /// Adds this `StreamSubscription`s to bag
   /// or cancel it if the bag has been disposed.
   Future<bool> disposedBy(DisposeBag bag) => bag.addAll(this);

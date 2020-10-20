@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class PTStreamBuilder<T> extends StreamBuilder<T> {
+class NullableStreamBuilder<T> extends StreamBuilder<T> {
   final AsyncWidgetBuilder<T> builder;
   final T initialData;
 
-  const PTStreamBuilder({
+  const NullableStreamBuilder({
     Key key,
     this.initialData,
     Stream<T> stream,
@@ -19,8 +19,7 @@ class PTStreamBuilder<T> extends StreamBuilder<T> {
   @override
   Widget build(BuildContext context, AsyncSnapshot<T> currentSummary) {
     return Container(
-      child:
-          currentSummary.data != null ? builder(context, currentSummary) : null,
+      child: currentSummary.data != null ? builder(context, currentSummary) : null,
     );
   }
 }
