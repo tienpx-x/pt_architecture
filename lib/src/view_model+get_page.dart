@@ -8,13 +8,15 @@ class GetPageResult<T> {
   Stream<bool> isLoading;
   Stream<bool> isReloading;
   Stream<bool> isLoadingMore;
+  Stream<bool> isEmpty;
 
   GetPageResult(
       {@required this.item,
       @required this.fetch,
       @required this.isLoading,
       @required this.isReloading,
-      @required this.isLoadingMore});
+      @required this.isLoadingMore,
+      @required this.isEmpty});
 }
 
 class GetPageInputWithParams<Item, Input> {
@@ -57,28 +59,46 @@ extension Methods on ViewModelType {
     var isReloading = BehaviorSubject<bool>.seeded(false);
     var isLoadingMore = BehaviorSubject<bool>.seeded(false);
 
+    var isEmpty = BehaviorSubject<bool>.seeded(false);
+
     var isLoadingOrLoadingMore =
         Rx.merge([isLoading, isReloading, isLoadingMore])
             .startWith(false)
             .asBroadcastStream();
 
     var loadItems = input.loadTrigger
+        .withLatestFrom(isEmpty, (t, s) => t)
+        .doOnData((_) => isEmpty.add(false))
         .withLatestFrom(isLoadingOrLoadingMore, (t, s) => [t, s])
         .where((args) => !args[1])
         .switchMap((args) => input.getItems(args[0]).trackActivity(isLoading))
-        .doOnData((data) => pageSubject.add(data))
+        .doOnData((page) {
+          if (page.items.isEmpty) {
+            isEmpty.add(true);
+          }
+          pageSubject.add(page);
+        })
         .mapTo<void>(null)
         .asBroadcastStream();
 
     var reloadItems = input.reloadTrigger
+        .withLatestFrom(isEmpty, (t, s) => t)
+        .doOnData((_) => isEmpty.add(false))
         .withLatestFrom(isLoadingOrLoadingMore, (t, s) => [t, s])
         .where((args) => !args[1])
         .switchMap((args) => input.getItems(args[0]).trackActivity(isReloading))
-        .doOnData((data) => pageSubject.add(data))
+        .doOnData((page) {
+          if (page.items.isEmpty) {
+            isEmpty.add(true);
+          }
+          pageSubject.add(page);
+        })
         .mapTo<void>(null)
         .asBroadcastStream();
 
     var loadMoreItems = input.loadMoreTrigger
+        .withLatestFrom(isEmpty, (t, s) => t)
+        .doOnData((_) => isEmpty.add(false))
         .throttleTime(Duration(seconds: 1))
         .withLatestFrom(isLoadingOrLoadingMore, (t, s) => [t, s])
         .where((args) => !args[1])
@@ -110,7 +130,8 @@ extension Methods on ViewModelType {
         fetch: fetchItems,
         isLoading: isLoading,
         isReloading: isReloading,
-        isLoadingMore: isLoadingMore);
+        isLoadingMore: isLoadingMore,
+        isEmpty: isEmpty);
   }
 
   GetPageResult<Item> getPage<Item>(GetPageInput<Item> input) {

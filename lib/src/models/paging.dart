@@ -4,4 +4,9 @@ class PagingInfo<T> {
   bool hasMorePages;
 
   PagingInfo(this.page, this.items, this.hasMorePages);
+
+  @override
+  String toString() {
+    return 'PagingInfo: {page: $page, items: $items, hasMorePages: $hasMorePages}';
+  }
 }

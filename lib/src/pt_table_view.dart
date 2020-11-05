@@ -9,10 +9,14 @@ class PTTableView extends StatefulWidget {
   final int scrollOffset;
   final BehaviorSubject<bool> isLoadingMore;
   final BehaviorSubject<bool> isRefreshing;
+  final BehaviorSubject<bool> isEmpty;
+  final BehaviorSubject<bool> isLoading;
   final VoidCallback onLoadMore;
   final RefreshCallback onRefresh;
   final Widget child;
-  final Widget indicator;
+  final Widget loadingIndicator;
+  final Widget loadingMoreIndicator;
+  final Widget emptyView;
 
   const PTTableView({
     Key key,
@@ -21,8 +25,12 @@ class PTTableView extends StatefulWidget {
     this.onRefresh,
     this.isLoadingMore,
     this.isRefreshing,
-    this.indicator,
     @required this.child,
+    this.isEmpty,
+    this.emptyView,
+    this.isLoading,
+    this.loadingIndicator,
+    this.loadingMoreIndicator,
   })  : assert(child != null),
         super(key: key);
 
@@ -48,8 +56,10 @@ class _PTTableViewState extends State<PTTableView> {
         child: RefreshIndicator(
           child: Column(
             children: [
+              _buildLoadingIndicator(),
+              _buildEmptyView(),
               Expanded(child: widget.child),
-              _buildIndicator(),
+              _buildLoadingMoreIndicator()
             ],
           ),
           onRefresh: widget.onRefresh,
@@ -58,13 +68,24 @@ class _PTTableViewState extends State<PTTableView> {
       );
     } else if (widget.onRefresh != null) {
       return RefreshIndicator(
-        child: widget.child,
+        child: Column(
+          children: [
+            _buildLoadingIndicator(),
+            _buildEmptyView(),
+            Expanded(child: widget.child)
+          ],
+        ),
         onRefresh: widget.onRefresh,
       );
     } else if (widget.onLoadMore != null) {
       return NotificationListener<ScrollNotification>(
         child: Column(
-          children: [Expanded(child: widget.child), _buildIndicator()],
+          children: [
+            _buildLoadingIndicator(),
+            _buildEmptyView(),
+            Expanded(child: widget.child),
+            _buildLoadingMoreIndicator()
+          ],
         ),
         onNotification: _handleLoadMoreScroll,
       );
@@ -72,12 +93,12 @@ class _PTTableViewState extends State<PTTableView> {
     return widget.child;
   }
 
-  Widget _buildIndicator() {
+  Widget _buildLoadingIndicator() {
     return StreamBuilder<bool>(
-        stream: widget.isLoadingMore,
+        stream: widget.isLoading,
         builder: (context, snapshot) {
-          if (snapshot.data) {
-            if (widget.indicator == null) {
+          if (snapshot?.data ?? false) {
+            if (widget.loadingIndicator == null) {
               return Container(
                 width: 55,
                 height: 55,
@@ -87,7 +108,43 @@ class _PTTableViewState extends State<PTTableView> {
                 ),
               );
             } else {
-              return widget.indicator;
+              return widget.loadingIndicator;
+            }
+          }
+          return Container(width: 0, height: 0);
+        });
+  }
+
+  Widget _buildEmptyView() {
+    return StreamBuilder<bool>(
+        initialData: false,
+        stream: widget.isEmpty,
+        builder: (context, snapshot) {
+          if (snapshot?.data ?? false) {
+            if (widget.emptyView != null) {
+              return widget.emptyView;
+            }
+          }
+          return Container(width: 0, height: 0);
+        });
+  }
+
+  Widget _buildLoadingMoreIndicator() {
+    return StreamBuilder<bool>(
+        stream: widget.isLoadingMore,
+        builder: (context, snapshot) {
+          if (snapshot?.data ?? false) {
+            if (widget.loadingMoreIndicator == null) {
+              return Container(
+                width: 55,
+                height: 55,
+                padding: EdgeInsets.all(15),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              );
+            } else {
+              return widget.loadingMoreIndicator;
             }
           }
           return Container();

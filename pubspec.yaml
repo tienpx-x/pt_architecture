@@ -1,6 +1,6 @@
 name: pt_architecture
 description: Clean Architecture with RxDart and MVVM.
-version: 1.0.0+1
+version: 1.0.1+1
 homepage: https://github.com/tienpx-x/pt_architecture
 
 environment:
