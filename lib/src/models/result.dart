@@ -15,6 +15,7 @@ extension ResultExtension<T> on Stream<T> {
     this.listen((data) {
       subject.add(Result(data: data, isLoading: false));
     }, onError: (e) {
+      print('[❌] Compose Result Error: $e');
       subject.add(Result(data: null, error: e, isLoading: false));
     });
     return subject.startWith(Result(data: null, isLoading: true, error: null));
