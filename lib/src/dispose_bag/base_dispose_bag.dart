@@ -17,9 +17,8 @@ enum BagResult {
 typedef Logger = void Function(BagResult result, Set<dynamic> resources,
     [Object error, StackTrace stackTrace]);
 
-void _defaultLogger(
-  BagResult result,
-  Set<dynamic> resources, [Object error, StackTrace stackTrace]) {
+void _defaultLogger(BagResult result, Set<dynamic> resources,
+    [Object error, StackTrace stackTrace]) {
   switch (result) {
     case BagResult.disposedSuccess:
       print('Disposed successfully: ');
@@ -38,7 +37,6 @@ void _defaultLogger(
       print(' → StackTrace: $stackTrace');
       break;
   }
-  print(resources.mapIndexed((i, e) => '   $i → $e').join('\n'));
 }
 
 class _Pair<T, R> {
